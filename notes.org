@@ -1,0 +1,10 @@
+Things we need
+
+- Home page (2 versions, different background + version number)
+  one of them should randomly 500
+- Dockerfile to build node app
+- Write a simple test
+- Copy CI/CD pipeline to build image and upload to *dockerhub* not ghcr
+  (I'll handle the last step of deploying to kube)
+  
+  
