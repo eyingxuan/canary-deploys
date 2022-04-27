@@ -7,4 +7,4 @@ spec:
   type: slack
   channel: alerts
   username: flagger
-  address: SECRET
+  address: {{ .Values.flagger.slackwebhook }}
