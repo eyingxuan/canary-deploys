@@ -19,8 +19,10 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - run: npm install
-      - run: npm test
+      - run: |-
+          cd web
+          npm install
+          npm test
   build:
     # Name the Job
     name: Build and publish docker image
