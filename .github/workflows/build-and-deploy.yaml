@@ -62,6 +62,16 @@ jobs:
       - name: Deploy
         run: |-
           helm upgrade --install --set=myservice.tag=$IMAGE_TAG --set=flagger.slackwebhook=$SLACK_WEBHOOK canary-test ./canary
+
+          ok=false
+          until ${ok}; do
+              kubectl get canary/myservicecanary | grep 'Progressing' && ok=true || ok=false
+              sleep 5
+          done
+
+          kubectl wait canary/myservicecanary --for=condition=promoted --timeout=5m
+
+          kubectl get canary/myservicecanary | grep Succeeded
         env:
           IMAGE_TAG: ${{ github.sha }}
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
