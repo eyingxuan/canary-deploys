@@ -2,6 +2,10 @@ import { Router } from 'express';
 
 const router = Router();
 
+const getRandomInt = (max) => {
+	return Math.floor(Math.random() * max);
+}
+
 router.get('/', (req, res) => {
     if (getRandomInt(10) < 2) {	
 		res.status(500).send('This Version is supposed to fail 20% of the time.');
