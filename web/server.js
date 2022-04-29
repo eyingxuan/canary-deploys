@@ -12,6 +12,6 @@ console.log(
 const port = 9898
 app.listen(port, () => {
 	console.log(
-		`Server A running on port ${port}!`
+		`Server B running on port ${port}!`
 	);
 });
