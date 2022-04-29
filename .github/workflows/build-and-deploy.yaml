@@ -1,0 +1,77 @@
+name: Canary Deploys
+
+# Run this workflow every time a new commit pushed to your repository
+on: push
+
+jobs:
+  # Set the job key. The key is displayed as the job name
+  # when a job name is not provided
+  test:
+    # Name the Job
+    name: Test application
+    # Set the type of machine to run on
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks out a copy of your repository on the ubuntu-latest machine
+      - name: Checkout code
+        uses: actions/checkout@v2
+      # TODO: Setup node and test
+  build:
+    # Name the Job
+    name: Build and publish docker image
+    # Set the type of machine to run on
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      # Checks out a copy of your repository on the ubuntu-latest machine
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push web
+        uses: docker/build-push-action@v2
+        with:
+          context: web
+          push: true
+          tags: yingxuan/canary-test:${{ github.sha }}
+  deploy:
+    name: Deploy latest version of code
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Set Kube namespace
+        run: |-
+          aws eks --region us-east-1 update-kubeconfig --name cis188 --role-arn arn:aws:iam::474844133309:role/yxeng --alias cis188
+          kubectl config set-context --current --namespace=yxeng
+      - name: Deploy
+        run: |-
+          helm upgrade --install --set=myservice.tag=$IMAGE_TAG --set=flagger.slackwebhook=$SLACK_WEBHOOK canary-test ./canary
+
+          ok=false
+          until ${ok}; do
+              kubectl get canary/myservicecanary | grep 'Progressing' && ok=true || ok=false
+              sleep 5
+          done
+
+          kubectl wait canary/myservicecanary --for=condition=promoted --timeout=5m
+
+          kubectl get canary/myservicecanary | grep Succeeded
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
