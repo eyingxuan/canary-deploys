@@ -9,5 +9,4 @@ RUN npm install
 
 COPY . /app/
 
-#TODO: change to server.js
-CMD ["node", "server_a.js"]
+CMD ["node", "server.js"]
