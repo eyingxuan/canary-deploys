@@ -40,6 +40,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: web
+          push: true
           tags: yingxuan/canary-test:${{ github.sha }}
   deploy:
     name: Deploy latest version of code
@@ -60,7 +61,7 @@ jobs:
           kubectl config set-context --current --namespace=yxeng
       - name: Deploy
         run: |-
-          helm upgrade --install --set=myservice.tag=$IMAGE_TAG --set=flagger.slackwebhook=$SLACK_WEBHOOK hw4-yxeng ./canary
+          helm upgrade --install --set=myservice.tag=$IMAGE_TAG --set=flagger.slackwebhook=$SLACK_WEBHOOK canary-test ./canary
         env:
           IMAGE_TAG: ${{ github.sha }}
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
