@@ -1,7 +1,10 @@
 import { Router } from 'express';
-import path from 'path';
 
 const router = Router();
+
+const getRandomInt = (max) => {
+	return Math.floor(Math.random() * max);
+}
 
 router.get('/', (req, res) => {
     if (getRandomInt(10) < 2) {	
