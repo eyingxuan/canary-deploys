@@ -16,7 +16,11 @@ jobs:
       # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
         uses: actions/checkout@v2
-      # TODO: Setup node and test
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: npm install
+      - run: npm test
   build:
     # Name the Job
     name: Build and publish docker image
