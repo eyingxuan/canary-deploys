@@ -1,17 +1,15 @@
-const express = require('express');
-const path = require('path');
+import express from 'express';
+import router from './routes.js';
 
 const app = express();
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '/html/version_a.html'));
-});
+app.use('/', router);
 
 console.log(
 	'Authors: Edward Kim (kime022), Ying Xuan Eng (yxeng)'
 );
 
-const port = 8080
+const port = 9898
 app.listen(port, () => {
 	console.log(
 		`Server A running on port ${port}!`
