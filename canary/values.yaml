@@ -1,5 +1,5 @@
 myservice:
-  image: test/image
+  image: yingxuan/canary-test
   tag: 1.0.0
 flagger:
   slackwebhook: https://slack.com
